@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MESL Revalida Reviewer</title>
+  <style>
+    :root{
+      --bg:#f4f7fb;
+      --card:#ffffff;
+      --text:#1f2937;
+      --muted:#6b7280;
+      --primary:#2563eb;
+      --primary-dark:#1d4ed8;
+      --accent:#0ea5e9;
+      --success:#16a34a;
+      --danger:#dc2626;
+      --border:#dbe3ee;
+      --soft:#eff6ff;
+    }
+
+    *{box-sizing:border-box}
+
+    body{
+      margin:0;
+      font-family:Arial, Helvetica, sans-serif;
+      background:linear-gradient(180deg,#eef4ff 0%, var(--bg) 100%);
+      color:var(--text);
+    }
+
+    .container{
+      max-width:1100px;
+      margin:0 auto;
+      padding:20px;
+    }
+
+    .panel{
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:18px;
+      padding:20px;
+      margin-bottom:18px;
+      box-shadow:0 10px 24px rgba(0,0,0,.07);
+    }
+
+    h1,h2,h3{margin-top:0}
+    .sub{
+      color:var(--muted);
+      line-height:1.5;
+    }
+
+    .toolbar{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+
+    .group{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+
+    button, select{
+      border:none;
+      border-radius:12px;
+      padding:10px 14px;
+      font-size:1rem;
+    }
+
+    select{
+      border:1px solid var(--border);
+      background:#fff;
+      color:var(--text);
+    }
+
+    button{
+      background:var(--primary);
+      color:#fff;
+      cursor:pointer;
+      font-weight:700;
+      transition:.15s ease;
+    }
+
+    button:hover{
+      background:var(--primary-dark);
+      transform:translateY(-1px);
+    }
+
+    .secondary{
+      background:#eef2ff;
+      color:#1e3a8a;
+    }
+
+    .secondary:hover{
+      background:#dbeafe;
+    }
+
+    .success{
+      background:var(--success);
+    }
+
+    .danger{
+      background:var(--danger);
+    }
+
+    .active{
+      background:var(--accent) !important;
+      color:#fff !important;
+    }
+
+    .hidden{
+      display:none;
+    }
+
+    .info-badges{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      margin-top:10px;
+    }
+
+    .badge{
+      background:#e0f2fe;
+      color:#075985;
+      padding:7px 12px;
+      border-radius:999px;
+      font-size:.9rem;
+      font-weight:700;
+    }
+
+    .card-box{
+      min-height:290px;
+      border:2px dashed #bfdbfe;
+      border-radius:18px;
+      background:#f8fbff;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      align-items:center;
+      text-align:center;
+      padding:24px;
+    }
+
+    .topic{
+      color:#0369a1;
+      font-weight:700;
+      text-transform:uppercase;
+      font-size:.9rem;
+      letter-spacing:.05em;
+      margin-bottom:10px;
+    }
+
+    .label{
+      color:var(--muted);
+      font-size:.85rem;
+      font-weight:700;
+      margin-bottom:8px;
+    }
+
+    .big-text{
+      font-size:1.35rem;
+      line-height:1.5;
+      max-width:850px;
+    }
+
+    .controls{
+      display:flex;
+      justify-content:center;
+      flex-wrap:wrap;
+      gap:10px;
+      margin-top:14px;
+    }
+
+    .status{
+      text-align:center;
+      color:var(--muted);
+      font-weight:700;
+      margin-top:12px;
+    }
+
+    .quiz-box{
+      border:2px dashed #bfdbfe;
+      border-radius:18px;
+      background:#f8fbff;
+      padding:20px;
+    }
+
+    .quiz-meta{
+      color:var(--muted);
+      font-weight:700;
+      margin-bottom:10px;
+    }
+
+    .question{
+      font-size:1.2rem;
+      font-weight:700;
+      line-height:1.45;
+      margin-bottom:16px;
+    }
+
+    .options{
+      display:grid;
+      gap:10px;
+    }
+
+    .option{
+      background:#fff;
+      color:var(--text);
+      border:1px solid var(--border);
+      border-radius:12px;
+      padding:12px;
+      text-align:left;
+      cursor:pointer;
+      transition:.12s ease;
+    }
+
+    .option:hover{
+      background:var(--soft);
+      border-color:#93c5fd;
+    }
+
+    .option.selected{
+      outline:2px solid #38bdf8;
+      background:#e0f2fe;
+    }
+
+    .option.correct{
+      background:#dcfce7;
+      border-color:#86efac;
+    }
+
+    .option.wrong{
+      background:#fee2e2;
+      border-color:#fca5a5;
+    }
+
+    .result{
+      margin-top:14px;
+      padding:12px;
+      border-radius:12px;
+      font-weight:700;
+      display:none;
+    }
+
+    .result.show{
+      display:block;
+    }
+
+    .result.ok{
+      background:#dcfce7;
+      color:#166534;
+    }
+
+    .result.no{
+      background:#fee2e2;
+      color:#991b1b;
+    }
+
+    .summary{
+      margin-top:16px;
+      padding:16px;
+      border-radius:14px;
+      background:#eff6ff;
+      border:1px solid #bfdbfe;
+      display:none;
+    }
+
+    .summary.show{
+      display:block;
+    }
+
+    .footer{
+      text-align:center;
+      color:var(--muted);
+      font-size:.95rem;
+      margin-top:8px;
+    }
+
+    @media (max-width:700px){
+      .toolbar{flex-direction:column; align-items:stretch}
+      .group{width:100%}
+      .group > *{width:100%}
+      .big-text{font-size:1.08rem}
+      .question{font-size:1.05rem}
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="panel">
+      <h1>MESL Revalida Reviewer</h1>
+      <p class="sub">
+        Quizlet-style reviewer for <strong>Engineering Economics</strong>, <strong>Physics and Mechanics</strong>,
+        <strong>Fluid Mechanics</strong>, <strong>Spring</strong>, <strong>Pressure Vessel</strong>, and <strong>Spur Gear</strong>.
+      </p>
+      <div class="info-badges">
+        <span class="badge" id="totalCardsBadge">150 Cards</span>
+        <span class="badge">Flashcards</span>
+        <span class="badge">Quiz Mode</span>
+        <span class="badge">GitHub Pages Ready</span>
+      </div>
+    </div>
+
+    <div class="panel toolbar">
+      <div class="group">
+        <button id="flashModeBtn" class="active">Flashcards</button>
+        <button id="quizModeBtn" class="secondary">Quiz</button>
+      </div>
+
+      <div class="group">
+        <label for="topicSelect"><strong>Topic:</strong></label>
+        <select id="topicSelect"></select>
+
+        <label for="quizLength"><strong>Quiz Items:</strong></label>
+        <select id="quizLength">
+          <option value="10">10</option>
+          <option value="20" selected>20</option>
+          <option value="30">30</option>
+          <option value="999">All Available</option>
+        </select>
+      </div>
+    </div>
+
+    <div id="flashPanel" class="panel">
+      <div class="card-box">
+        <div class="topic" id="flashTopic">Topic</div>
+        <div class="label" id="flashSide">QUESTION</div>
+        <div class="big-text" id="flashText">Loading...</div>
+      </div>
+
+      <div class="controls">
+        <button class="secondary" id="prevBtn">Previous</button>
+        <button id="flipBtn">Show Answer</button>
+        <button class="secondary" id="nextBtn">Next</button>
+        <button class="success" id="shuffleBtn">Shuffle</button>
+        <button class="danger" id="resetBtn">Reset Order</button>
+      </div>
+
+      <div class="status" id="flashStatus">Card 1 of 1</div>
+    </div>
+
+    <div id="quizPanel" class="panel hidden">
+      <div class="quiz-box">
+        <div class="topic" id="quizTopic">Topic</div>
+        <div class="quiz-meta" id="quizMeta">Press Start Quiz.</div>
+        <div class="question" id="quizQuestion">Your question will appear here.</div>
+        <div class="options" id="quizOptions"></div>
+        <div class="result" id="quizResult"></div>
+        <div class="summary" id="quizSummary"></div>
+      </div>
+
+      <div class="controls">
+        <button class="success" id="startQuizBtn">Start Quiz</button>
+        <button id="submitBtn">Submit Answer</button>
+        <button class="secondary" id="nextQuestionBtn">Next Question</button>
+      </div>
+    </div>
+
+    <div class="footer">
+      Tip: Study in flashcards first, then switch to quiz mode for recall practice.
+    </div>
+  </div>
+
+  <script>
+    const rawData = {
+      "Engineering Economics": [
+        ["What is engineering economics?", "The application of economic principles to evaluate engineering alternatives and choose the most cost-effective option."],
+        ["What is simple interest?", "Interest computed only on the original principal. Formula: I = P r t"],
+        ["What is compound interest?", "Interest computed on the principal plus previously earned interest. Formula: F = P(1 + i)^n"],
+        ["What is present worth?", "The current equivalent value of a future amount of money. Formula: P = F / (1 + i)^n"],
+        ["What is future worth?", "The value of money at a future time after earning interest."],
+        ["What is annual worth?", "The equivalent uniform annual value of a cash-flow series."],
+        ["What is an annuity?", "A series of equal payments or receipts made at equal time intervals."],
+        ["What is effective interest rate?", "The actual interest rate earned or paid in one year after considering compounding."],
+        ["What is nominal interest rate?", "The stated annual interest rate before considering compounding within the year."],
+        ["What is discounting?", "The process of finding the present value of a future amount."],
+        ["What is depreciation?", "The reduction in the value of an asset due to use, age, wear, or obsolescence."],
+        ["What is straight-line depreciation?", "A depreciation method that charges an equal amount each year. Formula: (First Cost - Salvage Value) / Life"],
+        ["What is sinking fund depreciation?", "A method that assumes equal annual deposits accumulate interest to recover the depreciable amount."],
+        ["What is book value?", "The remaining value of an asset after deducting accumulated depreciation from first cost."],
+        ["What is salvage value?", "The estimated value of an asset at the end of its useful life."],
+        ["What is first cost?", "The initial total cost of acquiring and installing an asset."],
+        ["What is operating cost?", "The cost incurred in running or using equipment or a system."],
+        ["What is maintenance cost?", "The cost required to keep equipment in working condition."],
+        ["What is fixed cost?", "A cost that does not change with the level of output within a given range."],
+        ["What is variable cost?", "A cost that changes in proportion to the level of production or activity."],
+        ["What is break-even point?", "The level of output where total revenue equals total cost."],
+        ["What is rate of return?", "The interest rate that makes the present worth of benefits equal to the present worth of costs."],
+        ["What is payback period?", "The time required for an investment to recover its initial cost from net cash inflows."],
+        ["What is cash flow?", "The movement of money into or out of a project, business, or investment over time."],
+        ["What is time value of money?", "The principle that money available now is worth more than the same amount in the future because it can earn interest."]
+      ],
+
+      "Physics and Mechanics": [
+        ["What is Newton's First Law?", "A body remains at rest or in uniform motion unless acted upon by a net external force."],
+        ["What is Newton's Second Law?", "The net force on a body equals mass times acceleration. Formula: F = m a"],
+        ["What is Newton's Third Law?", "For every action, there is an equal and opposite reaction."],
+        ["What is weight?", "The gravitational force acting on a body. Formula: W = m g"],
+        ["What is mass?", "The amount of matter in a body and a measure of its inertia."],
+        ["What is work?", "Work is done when a force acts through a distance. Formula: W = F d"],
+        ["What is power?", "The rate of doing work. Formula: P = W / t"],
+        ["What is kinetic energy?", "The energy possessed by a body due to motion. Formula: KE = 1/2 m v^2"],
+        ["What is potential energy?", "The energy possessed by a body due to position or configuration."],
+        ["What is momentum?", "The product of mass and velocity. Formula: p = m v"],
+        ["What is impulse?", "The product of force and time, equal to the change in momentum. Formula: J = F t"],
+        ["What is torque?", "The turning effect of a force about an axis. Formula: T = F r"],
+        ["What is a couple?", "A pair of equal and opposite parallel forces separated by a distance, producing pure rotation."],
+        ["What is equilibrium?", "A condition in which the sum of forces and the sum of moments are both zero."],
+        ["What is centroid?", "The geometric center of an area or shape."],
+        ["What is center of gravity?", "The point through which the resultant weight of a body acts."],
+        ["What is friction?", "The resisting force that opposes relative motion or tendency of motion between surfaces in contact."],
+        ["What is coefficient of friction?", "The ratio of frictional force to normal force. Symbol: mu"],
+        ["What is normal force?", "The perpendicular reaction force exerted by a surface on a body in contact with it."],
+        ["What is stress?", "The internal resisting force per unit area. Formula: stress = F / A"],
+        ["What is strain?", "The deformation per unit original length. Formula: strain = delta L / L"],
+        ["What is Young's modulus?", "The ratio of normal stress to normal strain within the elastic limit."],
+        ["What is shear stress?", "The tangential force per unit area acting parallel to a surface."],
+        ["What is shear strain?", "The angular distortion caused by shear stress."],
+        ["What is area moment of inertia?", "A geometric property that indicates a section's resistance to bending."],
+        ["What is angular velocity?", "The rate of change of angular displacement. Symbol: omega"],
+        ["What is angular acceleration?", "The rate of change of angular velocity. Symbol: alpha"],
+        ["What is projectile motion?", "The motion of a body under the influence of gravity after being projected."],
+        ["What is conservation of energy?", "Energy cannot be created or destroyed; it can only be transformed from one form to another."],
+        ["What is conservation of momentum?", "The total momentum of an isolated system remains constant if no external force acts on it."]
+      ],
+
+      "Fluid Mechanics": [
+        ["What is fluid mechanics?", "The study of fluids at rest and in motion and the forces acting on them."],
+        ["What is a fluid?", "A substance that deforms continuously under any applied shear stress."],
+        ["What is density?", "Mass per unit volume. Formula: rho = m / V"],
+        ["What is specific weight?", "Weight per unit volume. Formula: gamma = rho g"],
+        ["What is specific gravity?", "The ratio of the density of a substance to the density of water."],
+        ["What is pressure?", "Force per unit area. Formula: P = F / A"],
+        ["What is atmospheric pressure?", "The pressure exerted by the surrounding atmosphere."],
+        ["What is absolute pressure?", "The pressure measured relative to a perfect vacuum."],
+        ["What is gauge pressure?", "The pressure measured relative to atmospheric pressure."],
+        ["What is hydrostatic pressure?", "The pressure exerted by a fluid at rest due to its depth. Formula: P = rho g h"],
+        ["What is Pascal's law?", "Pressure applied to a confined fluid is transmitted equally in all directions."],
+        ["What is Archimedes' principle?", "A submerged body experiences an upward buoyant force equal to the weight of the displaced fluid."],
+        ["What is buoyant force?", "The upward force exerted by a fluid on an immersed or floating body."],
+        ["What is Bernoulli's equation?", "An expression of conservation of energy for flowing fluids: pressure head + velocity head + elevation head is constant for ideal flow."],
+        ["What is the continuity equation?", "A statement of conservation of mass in fluid flow. For incompressible flow: A1 V1 = A2 V2"],
+        ["What is viscosity?", "A fluid's resistance to flow or internal deformation."],
+        ["What is dynamic viscosity?", "The measure of a fluid's internal resistance to shear. Symbol: mu"],
+        ["What is kinematic viscosity?", "The ratio of dynamic viscosity to density. Symbol: nu"],
+        ["What is surface tension?", "The property that causes the free surface of a liquid to behave like a stretched membrane."],
+        ["What is capillarity?", "The rise or fall of a liquid in a small tube caused by surface tension and adhesion."],
+        ["What is Reynolds number?", "A dimensionless number used to predict whether flow is laminar or turbulent."],
+        ["What is laminar flow?", "Flow in which fluid particles move in smooth layers with little mixing."],
+        ["What is turbulent flow?", "Flow characterized by irregular fluctuations, eddies, and mixing."],
+        ["What is discharge?", "The volume of fluid flowing per unit time. Formula: Q = A V"],
+        ["What is flow rate?", "The amount of fluid passing a section per unit time; often the same as discharge."],
+        ["What is velocity head?", "The equivalent head representing kinetic energy per unit weight. Formula: v^2 / 2g"],
+        ["What is pressure head?", "The height of a fluid column equivalent to a given pressure. Formula: P / gamma"],
+        ["What is head loss?", "The energy loss of a flowing fluid due to friction or disturbances."],
+        ["What is cavitation?", "The formation and collapse of vapor bubbles in a liquid when local pressure falls below vapor pressure."],
+        ["What is a manometer?", "An instrument used to measure fluid pressure by balancing it against a column of liquid."]
+      ],
+
+      "Spring": [
+        ["What is a spring?", "An elastic machine element that deflects under load and returns to its original shape within the elastic limit."],
+        ["What is Hooke's Law?", "Within the elastic limit, force is proportional to deformation. Formula: F = k x"],
+        ["What is spring constant?", "The measure of spring stiffness. Symbol: k"],
+        ["What is spring deflection?", "The amount by which a spring extends or compresses under load."],
+        ["What is elastic limit?", "The maximum stress or deformation a spring can withstand and still return to its original shape."],
+        ["What is free length?", "The overall length of a spring when no load is applied."],
+        ["What is solid length?", "The length of a compression spring when all coils are fully compressed and touch each other."],
+        ["What is spring index?", "The ratio of mean coil diameter to wire diameter. Formula: C = D / d"],
+        ["What is spring rate?", "The load required per unit deflection of a spring; another term for stiffness."],
+        ["What is strain energy in a spring?", "The energy stored in a spring due to deformation. Formula: U = 1/2 k x^2"],
+        ["What is the equivalent stiffness of springs in series?", "For springs in series: 1 / keq = 1/k1 + 1/k2 + ..."],
+        ["What is the equivalent stiffness of springs in parallel?", "For springs in parallel: keq = k1 + k2 + ..."],
+        ["What is a helical spring?", "A spring made of wire coiled in the form of a helix."],
+        ["What is a compression spring?", "A spring designed to resist compressive loads."],
+        ["What is a tension spring?", "A spring designed to resist tensile loads and extend when pulled."],
+        ["What is a torsion spring?", "A spring that resists twisting and stores energy in angular deformation."],
+        ["What are active coils?", "The coils of a spring that actually participate in deflection under load."],
+        ["What are total coils?", "The entire number of coils in a spring, including active and inactive end coils."],
+        ["What is spring pitch?", "The axial distance between corresponding points of ad
